@@ -358,7 +358,6 @@
         <button class="nav-btn" onclick="showPage('pota')">POTA</button>
         <button class="nav-btn" onclick="showPage('hamalert')">HAMALERT</button>
         <button class="nav-btn" onclick="showPage('aprs')">APRS</button>
-        <button class="nav-btn" onclick="showPage('propagation')">Propagation</button>
         <button class="nav-btn" onclick="showPage('alert')">ALERT</button>
         <button class="nav-btn" onclick="showPage('tft')">TFT Screen</button>
         <button class="nav-btn" onclick="showPage('config')">Settings</button>
@@ -445,37 +444,6 @@
                     </tbody>
                 </table>
                 <div class="status" id="aprs-status">Waiting for APRS data...</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="propagation-page" class="page">
-        <div class="cyd-container">
-            <h2 style="color: #e0e0e0; margin-bottom: 12px; text-align: center;">PROPAGATION</h2>
-            <div class="cyd-screen">
-                <h3 style="margin: 0 0 10px; color: #e0e0e0;">Propagation</h3>
-                <table id="propagation-table">
-                    <tbody>
-                        <tr><th style="width: 45%;">SOLAR FLUX INDEX</th><td id="prop-sfi">--</td></tr>
-                        <tr><th>K-INDEX</th><td id="prop-kindex">--</td></tr>
-                        <tr><th>A-INDEX</th><td id="prop-aindex">--</td></tr>
-                        <tr><th>MUF</th><td id="prop-muf">--</td></tr>
-                        <tr><th>UPDATED UTC</th><td id="prop-updated">--</td></tr>
-                    </tbody>
-                </table>
-
-                <h3 style="margin: 14px 0 10px; color: #e0e0e0;">HF BAND INFO</h3>
-                <table id="propagation-hf-table">
-                    <thead>
-                        <tr>
-                            <th>Band</th>
-                            <th>Day</th>
-                            <th>Night</th>
-                        </tr>
-                    </thead>
-                    <tbody id="prop-hf-tbody"></tbody>
-                </table>
-                <div class="status" id="propagation-status">Waiting for propagation data...</div>
             </div>
         </div>
     </div>
@@ -785,8 +753,8 @@
                 <h3>🚨 APRS ALERT</h3>
                 <div class="form-group">
                     <label>Watch callsigns list (comma-separated):</label>
-                    <input type="text" id="aprs_alert" name="aprs_alert" placeholder="SQ3NIK-9, SP3YOR, vu3gwn-7">
-                    <small>Single CSV field. Maximum 20 entries. Example: SQ3NIK-9, SP3YOR, vu3gwn* (trailing * = any SSID)</small>
+                    <input type="text" id="aprs_alert" name="aprs_alert" placeholder="SQ3NIK-9, SP3YOR, SP3KON-7">
+                    <small>Single CSV field. Maximum 20 entries. Example: SQ3NIK-9, SP3YOR, SP3KON* (trailing * = any SSID)</small>
                 </div>
                 <div class="form-group">
                     <label style="display: flex; align-items: center; gap: 10px;">
@@ -810,7 +778,7 @@
                         <input type="checkbox" id="aprs_alert_nearby_enabled" name="aprs_alert_nearby_enabled" style="width: auto;" checked>
                         <span>Enable nearby mobile station detection (-7 and -9)</span>
                     </label>
-                    <small>Applies only to APRS stations with SSID -7 or -9 (e.g. vu3gwn-9, SQ3NIK-7).</small>
+                    <small>Applies only to APRS stations with SSID -7 or -9 (e.g. SP3KON-9, SQ3NIK-7).</small>
                 </div>
                 <div class="form-group">
                     <label style="display: flex; align-items: center; gap: 10px;">
@@ -945,23 +913,23 @@
                     <h3>🛰️ HAMALERT</h3>
                     <div class="form-group">
                         <label>Telnet Host:</label>
-                        <input type="text" id="hamalert_host" name="hamalert_host" value="hamalert.org">
-                        <small>Optional. Default: hamalert.org</small>
+                        <input type="text" id="hamalert_host" name="hamalert_host" value="hamalert.org" > <!--required>-->
+                        <small>Default: hamalert.org</small>
                     </div>
                     <div class="form-group">
                         <label>Telnet Port:</label>
-                        <input type="number" id="hamalert_port" name="hamalert_port" value="7300" min="1" max="65535">
-                        <small>Optional. Default: 7300</small>
+                        <input type="number" id="hamalert_port" name="hamalert_port" value="7300" min="1" max="65535"> <!--required>-->
+                        <small>Default: 7300</small>
                     </div>
                     <div class="form-group">
                         <label>Login:</label>
-                        <input type="text" id="hamalert_login" name="hamalert_login">
-                        <small>Optional. HamAlert account login for Telnet authentication</small>
+                        <input type="text" id="hamalert_login" name="hamalert_login"> <!--required>-->
+                        <small>HamAlert account login for Telnet authentication</small>
                     </div>
                     <div class="form-group">
-                        <label>Telnet Password:</label>
-                        <input type="password" id="hamalert_password" name="hamalert_password" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" spellcheck="false">
-                        <small>Optional. HAMALERT is disabled when login/password are empty</small>
+                        <label>Password:</label>
+                        <input type="password" id="hamalert_password" name="hamalert_password" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" spellcheck="false"> <!--required>-->
+                        <small>Required for HamAlert Telnet login</small>
                     </div>
                 </div>
                 
@@ -980,17 +948,17 @@
                     </div>
                     <div class="form-group">
                         <label>Time Zone (UTC offset hours):</label>
-                        <input type="number" id="timezone" name="timezone" min="-12" max="14" step="0.5" value="5.5">
-                        <small>Hour offset from UTC (e.g. Poland: 1)</small>
+                        <input type="number" id="timezone" name="timezone" min="-12" max="14" step="0.5" value="0">
+                        <small>Hour offset from UTC (e.g. India: 5.50)</small>
                     </div>
                     <div class="form-group">
                         <label>Latitude:</label>
-                        <input type="number" step="0.000001" id="user_lat" name="user_lat" placeholder="e.g. 12.9372">
+                        <input type="number" step="0.000001" id="user_lat" name="user_lat" value="12.93" placeholder="e.g. 12.9372">
                         <small>Latitude in decimal format (like Google Maps). Example: 12.9372 for Bangalore</small>
                     </div>
                     <div class="form-group">
                         <label>Longitude:</label>
-                        <input type="number" step="0.000001" id="user_lon" name="user_lon" placeholder="e.g. 77.5489">
+                        <input type="number" step="0.000001" id="user_lon" name="user_lon" value="77.54" placeholder="e.g. 77.5489">
                         <small>Longitude in decimal format (like Google Maps). Example: 77.5489 for Bangalore</small>
                     </div>
                 </div>
@@ -999,7 +967,7 @@
                 <div class="config-section">
                     <h3>🔍 QRZ.com</h3>
                     <div class="form-group">
-                        <label>QRZ.com Username </label>
+                        <label>QRZ.com Username (XML API):</label>
                         <input type="text" id="qrz_user" name="qrz_user" placeholder="login QRZ">
                         <small>QRZ.com API username (optional, for extra callsign info)</small>
                     </div>
@@ -1051,7 +1019,7 @@
                     </div>
                     <div class="form-group">
                         <label>APRS Callsign:</label>
-                        <input type="text" id="aprs_callsign" name="aprs_callsign" placeholder="vu3gwn">
+                        <input type="text" id="aprs_callsign" name="aprs_callsign" placeholder="sp3kon">
                         <small>Your callsign used to log in to APRS-IS</small>
                     </div>
                     <div class="form-group">
@@ -1290,8 +1258,6 @@
                 loadConfig();
             } else if (page === "aprs") {
                 loadAPRS();
-            } else if (page === "propagation") {
-                loadPropagation();
             } else if (page === "pota") {
                 loadPOTA();
             } else if (page === "hamalert") {
@@ -1350,11 +1316,7 @@
             return "Other";
         };
 
-        const getSdrModulation = (freqKHz, spotMode) => {
-            const mode = (spotMode || "").toUpperCase().trim();
-            if (mode === "CW" || mode.startsWith("CW")) {
-                return "cw";
-            }
+        const getSdrModulation = (freqKHz) => {
             for (const band of bandPlan) {
                 if (freqKHz >= band.min && freqKHz <= band.max) {
                     return band.mode;
@@ -1373,14 +1335,13 @@
             return call ? "https://www.qrz.com/db/" + encodeURIComponent(call) : "#";
         }
 
-        const getSdrLink = (freqKHz, spotMode) => {
+        const getSdrLink = (freqKHz) => {
             if (!openWebRxBase || openWebRxBase.trim() === "") return "#";
-            const mod = getSdrModulation(freqKHz, spotMode);
-            // KiwiSDR URL tuning uses f=, e.g. ?f=14303.55usb
+            const mod = getSdrModulation(freqKHz);
+            // WebSDR accepts fractional kHz, e.g. 14303.55usb
             let freqStr = Number(freqKHz || 0).toFixed(2);
             freqStr = freqStr.replace(/\.0+$/, "").replace(/\.([1-9]*?)0+$/, ".$1");
-            const sep = openWebRxBase.includes("?") ? "&" : "/?";
-            return openWebRxBase + sep + "f=" + freqStr + mod;
+            return openWebRxBase + "/?tune=" + freqStr + mod;
         }
         
         const updateTable = () => {
@@ -1427,7 +1388,7 @@
                 const freqCell = row.insertCell(2);
                 if (spot.frequency) {
                     const freqText = (spot.frequency / 1000).toFixed(3) + " MHz";
-                    const sdrLink = getSdrLink(spot.frequency, spot.mode);
+                    const sdrLink = getSdrLink(spot.frequency);
                     if (sdrLink && sdrLink !== "#" && openWebRxBase && openWebRxBase.trim() !== "") {
                         const link = document.createElement("a");
                         link.href = sdrLink;
@@ -1522,8 +1483,8 @@
                     document.getElementById('cluster_host').value = data.cluster_host || "";
                     document.getElementById('cluster_port').value = data.cluster_port || "";
                     document.getElementById('pota_api_url').value = data.pota_api_url || "https://api.pota.app/v1/spots";
-                    document.getElementById('hamalert_host').value = data.hamalert_host || "";
-                    document.getElementById('hamalert_port').value = (data.hamalert_port !== undefined && data.hamalert_port !== null && data.hamalert_port > 0) ? data.hamalert_port : "";
+                    document.getElementById('hamalert_host').value = data.hamalert_host || "hamalert.org";
+                    document.getElementById('hamalert_port').value = (data.hamalert_port !== undefined && data.hamalert_port !== null) ? data.hamalert_port : 7300;
                     document.getElementById('hamalert_login').value = data.hamalert_login || "";
                     document.getElementById('hamalert_password').value = data.hamalert_password || "";
                     document.getElementById('user_callsign').value = data.user_callsign || "";
@@ -1675,7 +1636,7 @@
                 if (isFinite(freq) && freq > 0) {
                     const freqText = freq.toFixed(3) + " MHz";
                     const freqKHz = freq * 1000.0;
-                    const sdrLink = getSdrLink(freqKHz, spot.mode);
+                    const sdrLink = getSdrLink(freqKHz);
                     if (sdrLink && sdrLink !== "#" && openWebRxBase && openWebRxBase.trim() !== "") {
                         const link = document.createElement("a");
                         link.href = sdrLink;
@@ -1805,7 +1766,7 @@
                 if (isFinite(freq) && freq > 0) {
                     const freqText = freq.toFixed(3) + " MHz";
                     const freqKHz = freq * 1000.0;
-                    const sdrLink = getSdrLink(freqKHz, spot.mode);
+                    const sdrLink = getSdrLink(freqKHz);
                     if (sdrLink && sdrLink !== "#" && openWebRxBase && openWebRxBase.trim() !== "") {
                         const link = document.createElement("a");
                         link.href = sdrLink;
@@ -1889,81 +1850,8 @@
                 })
                 .catch(err => console.log("Error loading APRS stations:", err));
         }
-
-        const setPropagationField = (id, value) => {
-            const el = document.getElementById(id);
-            if (!el) return;
-            const text = (value === undefined || value === null) ? "" : String(value).trim();
-            el.textContent = text.length ? text : "--";
-        }
-
-        const updatePropagationView = (data) => {
-            const valid = !!(data && data.valid);
-            const bands = (data && Array.isArray(data.hfBands)) ? data.hfBands : [];
-
-            setPropagationField('prop-sfi', valid ? data.sfi : "--");
-            setPropagationField('prop-kindex', valid ? data.kindex : "--");
-            setPropagationField('prop-aindex', valid ? data.aindex : "--");
-            setPropagationField('prop-muf', valid ? data.muf : "--");
-            setPropagationField('prop-updated', valid ? data.updated : "--");
-
-            const tbody = document.getElementById('prop-hf-tbody');
-            if (tbody) {
-                tbody.innerHTML = "";
-                bands.forEach((band) => {
-                    const row = tbody.insertRow();
-                    row.insertCell(0).textContent = band.label || "-";
-                    row.insertCell(1).textContent = band.day || "-";
-                    row.insertCell(2).textContent = band.night || "-";
-                });
-                if (bands.length === 0) {
-                    const row = tbody.insertRow();
-                    const cell = row.insertCell(0);
-                    cell.colSpan = 3;
-                    cell.textContent = "No HF BAND INFO data";
-                }
-            }
-
-            const status = document.getElementById('propagation-status');
-            if (status) {
-                if (valid) {
-                    status.textContent = "Propagation data is up to date";
-                } else {
-                    const err = (data && data.lastError) ? String(data.lastError).trim() : "";
-                    status.textContent = err ? ("No current data: " + err) : "No current propagation data";
-                }
-            }
-        }
-
-        const loadPropagation = () => {
-            fetch('/api/propagation')
-                .then(r => r.json())
-                .then(data => {
-                    updatePropagationView(data || {});
-                })
-                .catch(() => {
-                    updatePropagationView({ valid: false, hfBands: [], lastError: "API connection error" });
-                });
-        }
         
-        const collectHamalertConfig = () => {
-            const login = document.getElementById('hamalert_login').value.trim();
-            const password = document.getElementById('hamalert_password').value.trim();
-            const enabled = login.length > 0 && password.length > 0;
-            const host = document.getElementById('hamalert_host').value.trim();
-            const rawPort = parseInt(document.getElementById('hamalert_port').value, 10);
-
-            return {
-                host: enabled ? (host || "hamalert.org") : "",
-                port: enabled ? ((Number.isFinite(rawPort) && rawPort > 0 && rawPort <= 65535) ? rawPort : 7300) : 0,
-                login,
-                password
-            };
-        };
-
-        const collectConfigPayload = () => {
-            const hamalertCfg = collectHamalertConfig();
-            return {
+        const collectConfigPayload = () => ({
             wifi_ssid: document.getElementById('wifi_ssid').value,
             wifi_pass: document.getElementById('wifi_pass').value,
             wifi_ssid2: document.getElementById('wifi_ssid2').value,
@@ -1984,13 +1872,13 @@
             cluster_host: document.getElementById('cluster_host').value,
             cluster_port: parseInt(document.getElementById('cluster_port').value),
             pota_api_url: document.getElementById('pota_api_url').value,
-            hamalert_host: hamalertCfg.host,
-            hamalert_port: hamalertCfg.port,
-            hamalert_login: hamalertCfg.login,
-            hamalert_password: hamalertCfg.password,
+            hamalert_host: document.getElementById('hamalert_host').value,
+            hamalert_port: parseInt(document.getElementById('hamalert_port').value) || 7300,
+            hamalert_login: document.getElementById('hamalert_login').value,
+            hamalert_password: document.getElementById('hamalert_password').value,
             user_callsign: document.getElementById('user_callsign').value,
             user_locator: document.getElementById('user_locator').value,
-            timezone: parseFloat(document.getElementById('timezone').value) || 0,
+            timezone: parseInt(document.getElementById('timezone').value) || 0,
             user_lat: parseFloat(document.getElementById('user_lat').value) || 0,
             user_lon: parseFloat(document.getElementById('user_lon').value) || 0,
             qrz_user: document.getElementById('qrz_user').value,
@@ -2052,8 +1940,7 @@
             })(),
             screen_order: readScreenOrderFromUI()
             // Note: APRS uses coordinates from "Your Station" (user_lat, user_lon)
-        };
-        };
+        });
 
         const resetTftRotation = () => {
             if (!confirm('Are you sure you want to reset TFT rotation to default (1)?')) {
@@ -2146,10 +2033,6 @@
         loadAPRS();
         setInterval(loadAPRS, 2000);
 
-        // Polling Propagation - refresh every 60 seconds
-        loadPropagation();
-        setInterval(loadPropagation, 60000);
-
         // Polling POTA - refresh every 60 seconds
         loadPOTA();
         setInterval(loadPOTA, 60000);
@@ -2171,9 +2054,9 @@
         readContinentFilters();
     </script>
     <div style="margin: 20px auto 10px; max-width: 980px; padding: 10px 16px; color: #b0b0b0; font-size: 12px; text-align: center;">
-        Software designed and built by Konrad Wiśniewski vu3gwn (with the help of AI).<br>
-        Current software version: ESP32-HAM-CLOCK v1.21 (22.03.2026).<br>
-        For questions, contact: vu3gwn@gmail.com
+        Software designed and built by Konrad Wiśniewski SP3KON (with the help of AI).<br>
+        Current software version: ESP32-HAM-CLOCK v1.2 (04.03.2026).<br>
+        For questions, contact: sp3kon@gmail.com
     </div>
 </body>
 </html>

@@ -357,6 +357,7 @@
         <button class="nav-btn" onclick="showPage('pota')">POTA</button>
         <button class="nav-btn" onclick="showPage('hamalert')">HAMALERT</button>
         <button class="nav-btn" onclick="showPage('aprs')">APRS</button>
+        <button class="nav-btn" onclick="showPage('propagation')">Propagacja</button>
         <button class="nav-btn" onclick="showPage('alert')">ALERT</button>
         <button class="nav-btn" onclick="showPage('tft')">Ekran TFT</button>
         <button class="nav-btn" onclick="showPage('config')">Ustawienia</button>
@@ -443,6 +444,37 @@
                     </tbody>
                 </table>
                 <div class="status" id="aprs-status">Oczekiwanie na dane APRS...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="propagation-page" class="page">
+        <div class="cyd-container">
+            <h2 style="color: #e0e0e0; margin-bottom: 12px; text-align: center;">PROPAGACJA</h2>
+            <div class="cyd-screen">
+                <h3 style="margin: 0 0 10px; color: #e0e0e0;">Propagation</h3>
+                <table id="propagation-table">
+                    <tbody>
+                        <tr><th style="width: 45%;">SOLAR FLUX INDEX</th><td id="prop-sfi">--</td></tr>
+                        <tr><th>K-INDEX</th><td id="prop-kindex">--</td></tr>
+                        <tr><th>A-INDEX</th><td id="prop-aindex">--</td></tr>
+                        <tr><th>MUF</th><td id="prop-muf">--</td></tr>
+                        <tr><th>UPDATED UTC</th><td id="prop-updated">--</td></tr>
+                    </tbody>
+                </table>
+
+                <h3 style="margin: 14px 0 10px; color: #e0e0e0;">HF BAND INFO</h3>
+                <table id="propagation-hf-table">
+                    <thead>
+                        <tr>
+                            <th>Band</th>
+                            <th>Dzień</th>
+                            <th>Noc</th>
+                        </tr>
+                    </thead>
+                    <tbody id="prop-hf-tbody"></tbody>
+                </table>
+                <div class="status" id="propagation-status">Oczekiwanie na dane propagacyjne...</div>
             </div>
         </div>
     </div>
@@ -851,7 +883,7 @@
                     <div class="form-group">
                         <label>DX Cluster Host:</label>
                         <input type="text" id="cluster_host" name="cluster_host" required>
-                        <small>Adres serwera DX Cluster (np. dxc.metronet.pl lub dxspots.com)</small>
+                        <small>( np. dxspots.com port:7300, dxfun.com port: 8000)</small>
                     </div>
                     <div class="form-group">
                         <label>DX Cluster Port:</label>
@@ -912,23 +944,23 @@
                     <h3>🛰️ HAMALERT</h3>
                     <div class="form-group">
                         <label>Telnet Host:</label>
-                        <input type="text" id="hamalert_host" name="hamalert_host" value="hamalert.org" required>
-                        <small>Domyślnie: hamalert.org</small>
+                        <input type="text" id="hamalert_host" name="hamalert_host" value="hamalert.org">
+                        <small>Opcjonalne. Domyślnie: hamalert.org</small>
                     </div>
                     <div class="form-group">
                         <label>Telnet Port:</label>
-                        <input type="number" id="hamalert_port" name="hamalert_port" value="7300" min="1" max="65535" required>
-                        <small>Domyślnie: 7300</small>
+                        <input type="number" id="hamalert_port" name="hamalert_port" value="7300" min="1" max="65535">
+                        <small>Opcjonalne. Domyślnie: 7300</small>
                     </div>
                     <div class="form-group">
                         <label>Login:</label>
-                        <input type="text" id="hamalert_login" name="hamalert_login" required>
-                        <small>Login użytkownika HamAlert do logowania Telnet</small>
+                        <input type="text" id="hamalert_login" name="hamalert_login">
+                        <small>Opcjonalne. Login użytkownika HamAlert do logowania Telnet</small>
                     </div>
                     <div class="form-group">
-                        <label>Hasło:</label>
-                        <input type="password" id="hamalert_password" name="hamalert_password" required autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" spellcheck="false">
-                        <small>Pole wymagane do logowania Telnet do HamAlert</small>
+                        <label>Hasło Telnet:</label>
+                        <input type="password" id="hamalert_password" name="hamalert_password" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true" spellcheck="false">
+                        <small>Opcjonalne. Gdy login/hasło są puste, HAMALERT jest wyłączony</small>
                     </div>
                 </div>
                 
@@ -947,18 +979,18 @@
                     </div>
                     <div class="form-group">
                         <label>Strefa czasowa (UTC):</label>
-                        <input type="number" id="timezone" name="timezone" min="-12" max="14" step="1" value="0">
+                        <input type="number" id="timezone" name="timezone" min="-12" max="14" step="0.5" value="0">
                         <small>Przesunięcie godzin względem UTC (np. Polska: 1)</small>
                     </div>
                     <div class="form-group">
                         <label>Szerokość geograficzna (Latitude):</label>
                         <input type="number" step="0.000001" id="user_lat" name="user_lat" placeholder="np. 52.4064">
-                        <small>Współrzędna szerokości geograficznej w formacie dziesiętnym (jak Google Maps). Przykład: 52.4064 dla Warszawy</small>
+                        <small>Współrzędna szerokości geograficznej w formacie dziesiętnym (jak Google Maps). Przykład: 52.4064 dla Poznania</small>
                     </div>
                     <div class="form-group">
                         <label>Długość geograficzna (Longitude):</label>
                         <input type="number" step="0.000001" id="user_lon" name="user_lon" placeholder="np. 16.9252">
-                        <small>Współrzędna długości geograficznej w formacie dziesiętnym (jak Google Maps). Przykład: 16.9252 dla Warszawy</small>
+                        <small>Współrzędna długości geograficznej w formacie dziesiętnym (jak Google Maps). Przykład: 16.9252 dla Poznania</small>
                     </div>
                 </div>
                 
@@ -966,7 +998,7 @@
                 <div class="config-section">
                     <h3>🔍 QRZ.com</h3>
                     <div class="form-group">
-                        <label>QRZ.com Username (XML API):</label>
+                        <label>QRZ.com Username </label>
                         <input type="text" id="qrz_user" name="qrz_user" placeholder="login QRZ">
                         <small>Nazwa użytkownika do API QRZ.com (opcjonalne, dla dodatkowych informacji o znakach)</small>
                     </div>
@@ -1169,6 +1201,8 @@
                 loadConfig();
             } else if (page === "aprs") {
                 loadAPRS();
+            } else if (page === "propagation") {
+                loadPropagation();
             } else if (page === "pota") {
                 loadPOTA();
             } else if (page === "hamalert") {
@@ -1227,7 +1261,11 @@
             return "Other";
         };
 
-        const getSdrModulation = (freqKHz) => {
+        const getSdrModulation = (freqKHz, spotMode) => {
+            const mode = (spotMode || "").toUpperCase().trim();
+            if (mode === "CW" || mode.startsWith("CW")) {
+                return "cw";
+            }
             for (const band of bandPlan) {
                 if (freqKHz >= band.min && freqKHz <= band.max) {
                     return band.mode;
@@ -1246,13 +1284,14 @@
             return call ? "https://www.qrz.com/db/" + encodeURIComponent(call) : "#";
         }
 
-        const getSdrLink = (freqKHz) => {
+        const getSdrLink = (freqKHz, spotMode) => {
             if (!openWebRxBase || openWebRxBase.trim() === "") return "#";
-            const mod = getSdrModulation(freqKHz);
-            // WebSDR akceptuje kHz z częścią dziesiętną, np. 14303.55usb
+            const mod = getSdrModulation(freqKHz, spotMode);
+            // KiwiSDR URL tuning uses f=, e.g. ?f=14303.55usb
             let freqStr = Number(freqKHz || 0).toFixed(2);
             freqStr = freqStr.replace(/\.0+$/, "").replace(/\.([1-9]*?)0+$/, ".$1");
-            return openWebRxBase + "/?tune=" + freqStr + mod;
+            const sep = openWebRxBase.includes("?") ? "&" : "/?";
+            return openWebRxBase + sep + "f=" + freqStr + mod;
         }
         
                 const updateTable = () => {
@@ -1299,7 +1338,7 @@
                 const freqCell = row.insertCell(2);
                 if (spot.frequency) {
                     const freqText = (spot.frequency / 1000).toFixed(3) + " MHz";
-                    const sdrLink = getSdrLink(spot.frequency);
+                    const sdrLink = getSdrLink(spot.frequency, spot.mode);
                     if (sdrLink && sdrLink !== "#" && openWebRxBase && openWebRxBase.trim() !== "") {
                         const link = document.createElement("a");
                         link.href = sdrLink;
@@ -1394,8 +1433,8 @@
                     document.getElementById('cluster_host').value = data.cluster_host || "";
                     document.getElementById('cluster_port').value = data.cluster_port || "";
                     document.getElementById('pota_api_url').value = data.pota_api_url || "https://api.pota.app/v1/spots";
-                    document.getElementById('hamalert_host').value = data.hamalert_host || "hamalert.org";
-                    document.getElementById('hamalert_port').value = (data.hamalert_port !== undefined && data.hamalert_port !== null) ? data.hamalert_port : 7300;
+                    document.getElementById('hamalert_host').value = data.hamalert_host || "";
+                    document.getElementById('hamalert_port').value = (data.hamalert_port !== undefined && data.hamalert_port !== null && data.hamalert_port > 0) ? data.hamalert_port : "";
                     document.getElementById('hamalert_login').value = data.hamalert_login || "";
                     document.getElementById('hamalert_password').value = data.hamalert_password || "";
                     document.getElementById('user_callsign').value = data.user_callsign || "";
@@ -1637,7 +1676,7 @@
                         if (isFinite(freq) && freq > 0) {
                             const freqText = freq.toFixed(3) + " MHz";
                             const freqKHz = freq * 1000.0;
-                            const sdrLink = getSdrLink(freqKHz);
+                            const sdrLink = getSdrLink(freqKHz, spot.mode);
                             if (sdrLink && sdrLink !== "#" && openWebRxBase && openWebRxBase.trim() !== "") {
                                 const link = document.createElement("a");
                                 link.href = sdrLink;
@@ -1768,7 +1807,7 @@
                         if (isFinite(freq) && freq > 0) {
                             const freqText = freq.toFixed(3) + " MHz";
                             const freqKHz = freq * 1000.0;
-                            const sdrLink = getSdrLink(freqKHz);
+                            const sdrLink = getSdrLink(freqKHz, spot.mode);
                             if (sdrLink && sdrLink !== "#" && openWebRxBase && openWebRxBase.trim() !== "") {
                                 const link = document.createElement("a");
                                 link.href = sdrLink;
@@ -1852,8 +1891,81 @@
                 })
                 .catch(err => console.log("Błąd ładowania stacji APRS:", err));
         }
+
+        const setPropagationField = (id, value) => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const text = (value === undefined || value === null) ? "" : String(value).trim();
+            el.textContent = text.length ? text : "--";
+        }
+
+        const updatePropagationView = (data) => {
+            const valid = !!(data && data.valid);
+            const bands = (data && Array.isArray(data.hfBands)) ? data.hfBands : [];
+
+            setPropagationField('prop-sfi', valid ? data.sfi : "--");
+            setPropagationField('prop-kindex', valid ? data.kindex : "--");
+            setPropagationField('prop-aindex', valid ? data.aindex : "--");
+            setPropagationField('prop-muf', valid ? data.muf : "--");
+            setPropagationField('prop-updated', valid ? data.updated : "--");
+
+            const tbody = document.getElementById('prop-hf-tbody');
+            if (tbody) {
+                tbody.innerHTML = "";
+                bands.forEach((band) => {
+                    const row = tbody.insertRow();
+                    row.insertCell(0).textContent = band.label || "-";
+                    row.insertCell(1).textContent = band.day || "-";
+                    row.insertCell(2).textContent = band.night || "-";
+                });
+                if (bands.length === 0) {
+                    const row = tbody.insertRow();
+                    const cell = row.insertCell(0);
+                    cell.colSpan = 3;
+                    cell.textContent = "Brak danych HF BAND INFO";
+                }
+            }
+
+            const status = document.getElementById('propagation-status');
+            if (status) {
+                if (valid) {
+                    status.textContent = "Dane propagacyjne aktualne";
+                } else {
+                    const err = (data && data.lastError) ? String(data.lastError).trim() : "";
+                    status.textContent = err ? ("Brak aktualnych danych: " + err) : "Brak aktualnych danych propagacyjnych";
+                }
+            }
+        }
+
+        const loadPropagation = () => {
+            fetch('/api/propagation')
+                .then(r => r.json())
+                .then(data => {
+                    updatePropagationView(data || {});
+                })
+                .catch(() => {
+                    updatePropagationView({ valid: false, hfBands: [], lastError: "Błąd połączenia z API" });
+                });
+        }
         
-        const collectConfigPayload = () => ({
+        const collectHamalertConfig = () => {
+            const login = document.getElementById('hamalert_login').value.trim();
+            const password = document.getElementById('hamalert_password').value.trim();
+            const enabled = login.length > 0 && password.length > 0;
+            const host = document.getElementById('hamalert_host').value.trim();
+            const rawPort = parseInt(document.getElementById('hamalert_port').value, 10);
+
+            return {
+                host: enabled ? (host || "hamalert.org") : "",
+                port: enabled ? ((Number.isFinite(rawPort) && rawPort > 0 && rawPort <= 65535) ? rawPort : 7300) : 0,
+                login,
+                password
+            };
+        };
+
+        const collectConfigPayload = () => {
+            const hamalertCfg = collectHamalertConfig();
+            return {
             wifi_ssid: document.getElementById('wifi_ssid').value,
             wifi_pass: document.getElementById('wifi_pass').value,
             wifi_ssid2: document.getElementById('wifi_ssid2').value,
@@ -1874,13 +1986,13 @@
             cluster_host: document.getElementById('cluster_host').value,
             cluster_port: parseInt(document.getElementById('cluster_port').value),
             pota_api_url: document.getElementById('pota_api_url').value,
-            hamalert_host: document.getElementById('hamalert_host').value,
-            hamalert_port: parseInt(document.getElementById('hamalert_port').value) || 7300,
-            hamalert_login: document.getElementById('hamalert_login').value,
-            hamalert_password: document.getElementById('hamalert_password').value,
+            hamalert_host: hamalertCfg.host,
+            hamalert_port: hamalertCfg.port,
+            hamalert_login: hamalertCfg.login,
+            hamalert_password: hamalertCfg.password,
             user_callsign: document.getElementById('user_callsign').value,
             user_locator: document.getElementById('user_locator').value,
-            timezone: parseInt(document.getElementById('timezone').value) || 0,
+            timezone: parseFloat(document.getElementById('timezone').value) || 0,
             user_lat: parseFloat(document.getElementById('user_lat').value) || 0,
             user_lon: parseFloat(document.getElementById('user_lon').value) || 0,
             qrz_user: document.getElementById('qrz_user').value,
@@ -1942,7 +2054,8 @@
             })(),
             screen_order: readScreenOrderFromUI()
             // Uwaga: APRS używa współrzędnych z sekcji "Twoja Stacja" (user_lat, user_lon)
-        });
+        };
+        };
 
         const resetTftRotation = () => {
             if (!confirm('Czy na pewno chcesz przywrócić domyślną rotację TFT (1)?')) {
@@ -2043,6 +2156,10 @@
         loadAPRS();
         setInterval(loadAPRS, 2000);
 
+        // Polling Propagation - odświeżanie co 60 sekund
+        loadPropagation();
+        setInterval(loadPropagation, 60000);
+
         // Polling POTA - odświeżanie co 60 sekund
         loadPOTA();
         setInterval(loadPOTA, 60000);
@@ -2065,7 +2182,7 @@
     </script>
     <div style="margin: 20px auto 10px; max-width: 980px; padding: 10px 16px; color: #b0b0b0; font-size: 12px; text-align: center;">
         Oprogramowanie zostało zaprojektowane i wykonane przez Konrad Wiśniewski SP3KON (z użyciem AI).<br>
-        Obecna wersja oprogramowania ESP32-HAM-CLOCK v1.2 z dnia 04.03.2026.<br>
+        Obecna wersja oprogramowania ESP32-HAM-CLOCK v1.21 z dnia 22.03.2026.<br>
         W razie pytań proszę o kontakt: sp3kon@gmail.com
     </div>
 </body>
