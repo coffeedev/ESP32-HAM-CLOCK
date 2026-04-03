@@ -319,7 +319,7 @@ enum TftLang : uint8_t {
   TFT_LANG_PL = 0,
   TFT_LANG_EN = 1
 };
-uint8_t tftLanguage = TFT_LANG_PL;
+uint8_t tftLanguage = TFT_LANG_EN;
 
 enum DxTableSizeMode : uint8_t {
   DX_TABLE_SIZE_NORMAL = 0,
@@ -603,7 +603,7 @@ int touchCalNewYMax = TOUCH_Y_MAX;
 #define NTP_SERVER "pool.ntp.org"
 #define MAX_SPOTS 50  // Bufor 50 ostatnich spotów
 #define MAX_POTA_SPOTS 30  // Bufor 30 ostatnich spotów (TFT pokaże max 10)
-#define GMT_OFFSET_SEC 19800  // UTC+5:30 (India Time)
+#define GMT_OFFSET_SEC 0 //19800  // UTC+5:30 (India Time)
 #define DEFAULT_TIMEZONE_HOURS 5.5f
 #define DEFAULT_CALLSIGN "VU3GWN"
 #define DEFAULT_OPENWEBRX_URL "http://okno.ddns.net:8078"
@@ -984,6 +984,9 @@ String qrzPassword = "";
 String qrzStatus = "QRZ: not configured";
 String weatherApiKey = "407b38e4e0355adf151d95a5b3d6326d";
 String openWebRxUrl = DEFAULT_OPENWEBRX_URL;
+bool tft_nightsleep_enable = false;
+String tft_nightsleep_on = "" ;
+String tft_nightsleep_off = "" ;
 
 // Konfiguracja filtrĂłw CC-Cluster (dxspots.com)
 bool clusterNoAnnouncements = true;      // set/noann - wyłącz ogłoszenia
@@ -1171,22 +1174,21 @@ void drawWelcomeScreenYellow() {
   if (!tftInitialized) {
     return;
   }
+  //return;
   tft.fillScreen(TFT_BLACK);
   // Optional startup background from LittleFS (data/logo.bmp)
-  drawBmpFromFS("/logo.bmp", 0, 0);
+  drawBmpFromFS("data/logo.bmp", 0, 0);
   tft.setTextSize(1);
   const int centerX = 160;
   const int startY = 40;
   const int lineGap = 16;
   String lines[] = {
-    "ESP32-HAM-CLOCK",
-    "version 1.21",
-    "Created by SP3KON",
-    "(AI-assisted)",
-    "sp3kon@gmail.com",
-    ""
+    " ",
+    "BARC-HAM-CLOCK",
+    "version 1.5",
+    " "
   };
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 4; i++) {
     tft.setTextColor(TFT_YELLOW, TFT_BLACK);
     tft.setCursor(5, startY + i * lineGap);
     tft.print(lines[i]);
@@ -1883,7 +1885,7 @@ void drawHamClock() {
   tft.setTextSize(1);
   const char *timeLabel = "UTC";
   if (screen1TimeMode == SCREEN1_TIME_LOCAL) {
-    timeLabel = (tftLanguage == TFT_LANG_EN) ? "Local Time" : "Czas Lokalny";
+    timeLabel = "Local Time";
   }
   int labelWidth = (int)strlen(timeLabel) * 6;
   int labelX = frameX + (frameWidth - labelWidth) / 2;
@@ -1892,13 +1894,9 @@ void drawHamClock() {
 
   String dateText;
   if (screen1TimeMode == SCREEN1_TIME_LOCAL) {
-    dateText = (tftLanguage == TFT_LANG_EN)
-                 ? getEnglishDateStringFullWithTimezone()
-                 : getPolishDateStringFullWithTimezone();
+    dateText = getEnglishDateStringFullWithTimezone() ;
   } else {
-    dateText = (tftLanguage == TFT_LANG_EN)
-                 ? getEnglishDateStringFull()
-                 : getPolishDateStringFull();
+    dateText = getEnglishDateStringFull() ;
   }
   drawDateLine(dateText);
 
@@ -12156,6 +12154,18 @@ void loadPreferences() {
   wifiPassword2 = preferences->getString("wifi_pass2", "");
   yield();
   
+  tft_nightsleep_enable = preferences->getBool("tft_nightsleep_enable", false);
+  yield();
+  tft_nightsleep_on = preferences->getString("tft_nightsleep_on", "");
+  yield();
+  tft_nightsleep_off = preferences->getString("tft_nightsleep_off", "");
+  yield();
+  Serial.print("----------------------Load Preferences: tft_nightsleep_enable = ");
+  Serial.print(tft_nightsleep_enable ? "ON" : "OFF");
+  Serial.print(tft_nightsleep_on) ;
+  Serial.print(tft_nightsleep_off) ;
+  Serial.println("----------------------");
+  
   clusterHost = preferences->getString("cluster_host", DEFAULT_CLUSTER_HOST);
   yield();
   clusterPort = preferences->getInt("cluster_port", DEFAULT_CLUSTER_PORT);
@@ -12310,6 +12320,17 @@ void savePreferences() {
   preferences->putString("wifi_pass", wifiPassword);
   preferences->putString("wifi_ssid2", wifiSSID2);
   preferences->putString("wifi_pass2", wifiPassword2);
+  
+  preferences->putBool("tft_nightsleep_enable", tft_nightsleep_enable);
+  preferences->putString("tft_nightsleep_on", tft_nightsleep_on);
+  preferences->putString("tft_nightsleep_off", tft_nightsleep_off);
+
+  Serial.print("----------------------Save Preferences: tft_nightsleep_enable = ");
+  Serial.print(tft_nightsleep_enable ? "ON" : "OFF");
+  Serial.print(tft_nightsleep_on) ;
+  Serial.print(tft_nightsleep_off) ;
+  Serial.println("----------------------");
+  
   preferences->putString("cluster_host", clusterHost);
   preferences->putInt("cluster_port", clusterPort);
   preferences->putString("pota_host", potaClusterHost);
@@ -12400,8 +12421,8 @@ void setupWebServer() {
   
   // Strona gĹ‚Ăłwna
   server->on("/", HTTP_GET, []() {
-    if (littleFsReady && LittleFS.exists("/index.html")) {
-      File f = LittleFS.open("/index.html", "r");
+    if (littleFsReady && LittleFS.exists("/indexEN.html")) {
+      File f = LittleFS.open("/indexEN.html", "r");
       server->streamFile(f, "text/html; charset=utf-8");
       f.close();
     } else {
@@ -12409,7 +12430,7 @@ void setupWebServer() {
     }
   });
 
-  // Strona gĹ‚Ăłwna (alias /index.html)
+/*  // Strona gĹ‚Ăłwna (alias /index.html)
   server->on("/index.html", HTTP_GET, []() {
     if (littleFsReady && LittleFS.exists("/index.html")) {
       File f = LittleFS.open("/index.html", "r");
@@ -12418,7 +12439,7 @@ void setupWebServer() {
     } else {
       server->send(200, "text/html; charset=utf-8", getMainHTML());
     }
-  });
+  }); */
 
   // Strona gĹ‚Ăłwna (EN)
   server->on("/indexEN.html", HTTP_GET, []() {
@@ -12426,15 +12447,12 @@ void setupWebServer() {
       File f = LittleFS.open("/indexEN.html", "r");
       server->streamFile(f, "text/html; charset=utf-8");
       f.close();
-    } else if (littleFsReady && LittleFS.exists("/index.html")) {
-      File f = LittleFS.open("/index.html", "r");
-      server->streamFile(f, "text/html; charset=utf-8");
-      f.close();
     } else {
       server->send(404, "text/plain", "indexEN.html missing in LittleFS");
     }
   });
 
+    /*
   // Instrukcja (PL)
   server->on("/instrukcja.txt", HTTP_GET, []() {
     if (littleFsReady && LittleFS.exists("/instrukcja.txt")) {
@@ -12444,7 +12462,7 @@ void setupWebServer() {
     } else {
       server->send(404, "text/plain", "instrukcja.txt missing in LittleFS");
     }
-  });
+  }); */
 
   // Manual (EN)
   server->on("/manual.txt", HTTP_GET, []() {
@@ -12459,8 +12477,8 @@ void setupWebServer() {
   
   // Strona konfiguracji
   server->on("/config", HTTP_GET, []() {
-    if (littleFsReady && LittleFS.exists("/index.html")) {
-      File f = LittleFS.open("/index.html", "r");
+    if (littleFsReady && LittleFS.exists("/indexEN.html")) {
+      File f = LittleFS.open("/indexEN.html", "r");
       server->streamFile(f, "text/html; charset=utf-8");
       f.close();
     } else {
@@ -12607,12 +12625,24 @@ void setupWebServer() {
       
       wifiSSID = doc["wifi_ssid"].as<String>();
       wifiPassword = doc["wifi_pass"].as<String>();
+      
+
+
       if (doc["wifi_ssid2"].is<String>()) {
         wifiSSID2 = doc["wifi_ssid2"].as<String>();
       }
       if (doc["wifi_pass2"].is<String>()) {
         wifiPassword2 = doc["wifi_pass2"].as<String>();
       }
+
+      tft_nightsleep_enable = doc["tft_nightsleep_enable"].as<bool>();
+      if (doc["tft_nightsleep_on"].is<String>()) {
+        tft_nightsleep_on = doc["tft_nightsleep_on"].as<String>();
+      }
+      if (doc["tft_nightsleep_off"].is<String>()) {
+        tft_nightsleep_off = doc["tft_nightsleep_off"].as<String>();
+      }
+
       clusterHost = doc["cluster_host"].as<String>();
       if (doc["pota_host"].is<String>()) {
         potaClusterHost = doc["pota_host"].as<String>();
@@ -12928,6 +12958,8 @@ void setupWebServer() {
       wifiPassword.trim();
       wifiSSID2.trim();
       wifiPassword2.trim();
+      tft_nightsleep_on.trim();
+      tft_nightsleep_off.trim();
       clusterHost.trim();
       potaClusterHost.trim();
       potaFilterCommand.trim();
@@ -13093,6 +13125,9 @@ void setupWebServer() {
     doc["wifi_pass"] = wifiPassword;
     doc["wifi_ssid2"] = wifiSSID2;
     doc["wifi_pass2"] = wifiPassword2;
+    doc["tft_nightsleep_enable"] = tft_nightsleep_enable;
+    doc["tft_nightsleep_on"] = tft_nightsleep_on;
+    doc["tft_nightsleep_off"] = tft_nightsleep_off;
     doc["cluster_host"] = clusterHost;
     doc["cluster_port"] = clusterPort;
     doc["pota_host"] = potaClusterHost;
